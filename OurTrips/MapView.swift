@@ -14,40 +14,32 @@ struct MapView: View {
         center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
         span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
     ))
-    @State private var mapStyle: MapStyle = .standard
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            Map(position: $cameraPosition, style: mapStyle)
+            Map(position: $cameraPosition)
+#if os(iOS)
                 .mapControls {
                     MapUserLocationButton()
                     MapCompass()
                     MapScaleView()
                 }
+#endif
                 .onAppear {
                     locationManager.requestLocationPermission()
                     locationManager.startLocationUpdates()
                     updateCameraPosition()
                 }
-                .onChange(of: locationManager.region) { _, newRegion in
+                .onReceive(locationManager.$region) { newRegion in
                     cameraPosition = .region(newRegion)
                 }
                 .onDisappear {
                     locationManager.stopLocationUpdates()
                 }
             
-            // Map controls
+#if os(iOS)
+            // Map controls (iOS-only)
             VStack(spacing: 12) {
-                // Map style selector
-                Picker("Map Style", selection: $mapStyle) {
-                    Label("Standard", systemImage: "map").tag(MapStyle.standard)
-                    Label("Satellite", systemImage: "globe").tag(MapStyle.imagery)
-                    Label("Hybrid", systemImage: "map.fill").tag(MapStyle.hybrid)
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
-                
                 // Location button
                 Button(action: {
                     if let location = locationManager.location {
@@ -70,6 +62,7 @@ struct MapView: View {
                 }
             }
             .padding()
+#endif
         }
         .overlay(alignment: .bottom) {
             // Location status

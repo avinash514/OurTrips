@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 import CoreLocation
 import MapKit
 
@@ -32,10 +33,17 @@ class LocationManager: NSObject, ObservableObject {
     }
     
     func startLocationUpdates() {
+#if os(iOS)
         guard authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways else {
             requestLocationPermission()
             return
         }
+#else
+        guard authorizationStatus == .authorizedAlways else {
+            requestLocationPermission()
+            return
+        }
+#endif
         locationManager.startUpdatingLocation()
     }
     
@@ -63,9 +71,15 @@ extension LocationManager: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         Task { @MainActor in
             self.authorizationStatus = manager.authorizationStatus
+#if os(iOS)
             if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
                 startLocationUpdates()
             }
+#else
+            if authorizationStatus == .authorizedAlways {
+                startLocationUpdates()
+            }
+#endif
         }
     }
 }
