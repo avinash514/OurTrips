@@ -35,8 +35,16 @@ struct ContentView: View {
             
             // Floating profile button overlay
             if authManager.isAuthenticated {
-                ProfileFloatingButton()
-                    .environmentObject(authManager)
+                VStack {
+                    HStack {
+                        Spacer()
+                        ProfileFloatingButton()
+                            .environmentObject(authManager)
+                            .padding(.top, 8)
+                            .padding(.trailing, 16)
+                    }
+                    Spacer()
+                }
             }
         }
 #else
@@ -85,25 +93,17 @@ struct TripsListView: View {
     @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
-        ZStack {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        TripDetailView(item: item)
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+        List {
+            ForEach(items) { item in
+                NavigationLink {
+                    TripDetailView(item: item)
+                } label: {
+                    Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
                 }
-                .onDelete(perform: onDelete)
             }
-            .navigationTitle("Trips")
-            
-            // Floating profile button overlay
-            if authManager.isAuthenticated {
-                ProfileFloatingButton()
-                    .environmentObject(authManager)
-            }
+            .onDelete(perform: onDelete)
         }
+        .navigationTitle("Trips")
     }
 }
 #endif

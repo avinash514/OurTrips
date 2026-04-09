@@ -11,6 +11,7 @@ struct RegistrationView: View {
     @EnvironmentObject var authManager: AuthManager
     @Environment(\.presentationMode) var presentationMode
     
+    @State private var name = ""
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
@@ -35,6 +36,10 @@ struct RegistrationView: View {
                     
                     // Registration Form
                     VStack(spacing: 16) {
+                        TextField("Name", text: $name)
+                            .textFieldStyle(.roundedBorder)
+                            .textContentType(.name)
+                        
                         TextField("Email", text: $email)
                             .textFieldStyle(.roundedBorder)
                             .textContentType(.emailAddress)
@@ -61,7 +66,7 @@ struct RegistrationView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .frame(maxWidth: .infinity)
-                        .disabled(isLoading || email.isEmpty || password.isEmpty || confirmPassword.isEmpty)
+                        .disabled(isLoading || name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty)
                         
                         Button(action: {
                             presentationMode.wrappedValue.dismiss()
@@ -103,7 +108,7 @@ struct RegistrationView: View {
         
         // Simulate network request
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if authManager.register(email: email, password: password, name: email) {
+            if authManager.register(email: email, password: password, name: name) {
                 presentationMode.wrappedValue.dismiss()
             } else {
                 showAlert(message: "Registration failed. Please try again.")
