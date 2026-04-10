@@ -15,7 +15,7 @@ struct OurTripsApp: App {
     var sharedModelContainer: ModelContainer = {
         do {
             let modelConfiguration = ModelConfiguration(isStoredInMemoryOnly: false)
-            return try ModelContainer(for: Item.self, configurations: modelConfiguration)
+            return try ModelContainer(for: RoadTrip.self, Item.self, configurations: modelConfiguration)
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
